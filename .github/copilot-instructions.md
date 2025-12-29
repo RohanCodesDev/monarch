@@ -1,0 +1,9 @@
+- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+- [x] Clarify Project Requirements — Next.js pages router app named "monarch" with TypeScript and no React Compiler.
+- [x] Scaffold the Project — Files created in the current folder for a Next.js 14 pages router app.
+- [x] Customize the Project — Added home, about, and API hello routes plus global styling and shells.
+- [x] Install Required Extensions — None required from setup info.
+- [ ] Compile the Project — Run npm install then npm run lint && npm run build.
+- [ ] Create and Run Task — Add a VS Code task after installing dependencies if desired.
+- [ ] Launch the Project — After install, run npm run dev (confirm debug preference first).
+- [ ] Ensure Documentation is Complete — README added; update if instructions change.

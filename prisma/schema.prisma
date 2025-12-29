@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Artwork {
+  id          String   @id @default(cuid())
+  title       String
+  artist      String
+  description String   @db.Text
+  imageUrl    String
+  artifactType String? // cave_painting, hieroglyphics, pottery, sculpture, script, etc.
+  style       String?
+  period      String?
+  year        String?
+  medium      String?
+  civilization String? // Egyptian, Mesopotamian, Greek, Roman, etc.
+  analysis    String?  @db.Text
+  userId      String
+  isFavorite  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([artist])
+  @@index([style])
+  @@index([isFavorite])
+  @@index([artifactType])
+  @@index([civilization])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
