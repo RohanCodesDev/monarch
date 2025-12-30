@@ -1,9 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
+
+  useEffect(() => {
+    if (router.query.verified) {
+      setVerificationSuccess(true);
+      const timer = setTimeout(() => setVerificationSuccess(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [router.query.verified]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,6 +58,12 @@ export default function LoginPage() {
       <div style={styles.card}>
         <h1 style={styles.title}>Welcome Back</h1>
         <p style={styles.subtitle}>Login to Monarch - Historic Artifacts</p>
+
+        {verificationSuccess && (
+          <div style={styles.success}>
+            ✓ Email verified! You can now login.
+          </div>
+        )}
 
         <form onSubmit={handleLogin}>
           <label style={styles.label}>Email</label>
@@ -158,5 +173,15 @@ const styles = {
     color: "#fbbf24",
     cursor: "pointer",
     textDecoration: "underline",
+  },
+  success: {
+    background: "#10b981",
+    color: "#fff",
+    padding: "12px",
+    borderRadius: "8px",
+    marginBottom: "16px",
+    fontSize: "14px",
+    textAlign: "center",
+    fontWeight: "500",
   },
 };

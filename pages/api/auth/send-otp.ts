@@ -1,0 +1,62 @@
+import { NextApiRequest, NextApiResponse } from 'next';
+import { PrismaClient } from '@prisma/client';
+// nodemailer removed: OTPs will be logged to server console for now
+import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
+
+function generateOTP(): string {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { email, username, name, password } = req.body;
+
+    if (!email || !username || !name || !password) {
+      return res.status(400).json({ error: 'Email, username, name and password are required' });
+    }
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { username }],
+      },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ 
+        error: existingUser.email === email 
+          ? 'Email already registered' 
+          : 'Username already taken' 
+      });
+    }
+
+    // Generate OTP and hash password for temporary storage
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Log OTP to server console (no email sending configured)
+    console.info(`[OTP] send-otp for ${email}: ${otp} (expires ${otpExpiry.toISOString()})`);
+
+    // Store OTP data and registration info in base64 encoded cookie
+    const otpData = { email: email.toLowerCase(), username, name, hashedPassword, otp, otpExpiry: otpExpiry.toISOString() };
+    const encodedData = Buffer.from(JSON.stringify(otpData)).toString('base64');
+    
+    res.setHeader('Set-Cookie', `otp_session=${encodedData}; Path=/; HttpOnly; Max-Age=600; SameSite=Lax`);
+
+    return res.status(200).json({ 
+      success: true,
+      message: 'OTP sent to your email',
+      email: email.replace(/(.{2})(.*)(@.*)/, '$1***$3'), // Mask email
+    });
+  } catch (error) {
+    console.error('Error in send-otp:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}

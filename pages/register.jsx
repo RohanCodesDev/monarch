@@ -34,31 +34,26 @@ export default function RegisterPage() {
         throw new Error("Username must be at least 3 characters");
       }
 
-      const response = await fetch("/api/auth/register", {
+      // Send OTP to email first (include name and password for session storage)
+      const otpResponse = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          fullName, 
-          username, 
           email, 
-          password 
+          username,
+          name: fullName,
+          password,
         }),
       });
 
-      const data = await response.json();
+      const otpData = await otpResponse.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Registration failed");
+      if (!otpResponse.ok) {
+        throw new Error(otpData.error || "Failed to send OTP");
       }
 
-      // Store user info in localStorage
-      localStorage.setItem("userId", data.userId);
-      localStorage.setItem("userEmail", data.email);
-      localStorage.setItem("userName", data.name || "");
-      localStorage.setItem("username", data.username || "");
-
-      // Redirect to home page
-      router.push("/homepg");
+      // Redirect to OTP verification page (registration data stored server-side in cookie)
+      router.push("/verify-otp");
 
     } catch (err) {
       setError(err.message);
@@ -130,7 +125,7 @@ export default function RegisterPage() {
           {error && <p style={styles.error}>{error}</p>}
 
           <button type="submit" disabled={loading} style={styles.button}>
-            {loading ? "Creating account..." : "Register"}
+            {loading ? "Sending OTP..." : "Create Account"}
           </button>
         </form>
 

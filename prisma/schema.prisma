@@ -34,11 +34,14 @@ model Artwork {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  name      String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  email           String   @unique
+  username        String   @unique
+  name            String
+  password        String
+  isEmailVerified Boolean  @default(false)
+  verificationOTP String?
+  otpExpiry       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
