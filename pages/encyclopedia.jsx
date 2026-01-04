@@ -1,14 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Search, ExternalLink, ArrowLeft, Globe } from "lucide-react";
 import Link from "next/link";
 import Head from "next/head";
+import { t } from "../lib/translations";
 
 export default function Encyclopedia() {
   const [searchQuery, setSearchQuery] = useState("");
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [currentLang, setCurrentLang] = useState('en');
+  
+  useEffect(() => {
+    const lang = localStorage.getItem('preferredLanguage') || 'en';
+    setCurrentLang(lang);
+    
+    const handleLangChange = (e) => {
+      const newLang = e.detail || localStorage.getItem('preferredLanguage') || 'en';
+      // Use requestAnimationFrame for smooth update
+      requestAnimationFrame(() => {
+        setCurrentLang(newLang);
+      });
+    };
+    window.addEventListener('languageChange', handleLangChange);
+    return () => window.removeEventListener('languageChange', handleLangChange);
+  }, []);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -18,7 +35,9 @@ export default function Encyclopedia() {
     setSearched(true);
 
     try {
-      const response = await fetch(`/api/artworks/search?query=${encodeURIComponent(searchQuery)}`);
+      // Get user's language preference
+      const userLang = localStorage.getItem('preferredLanguage') || 'en';
+      const response = await fetch(`/api/artworks/search?query=${encodeURIComponent(searchQuery)}&lang=${userLang}`);
       const data = await response.json();
       setArtworks(data.artworks || []);
     } catch (error) {
@@ -48,7 +67,7 @@ export default function Encyclopedia() {
           <Link href="/homepg">
             <button className="flex items-center gap-2 text-amber-100 mb-8 hover:text-amber-50 transition-colors">
               <ArrowLeft className="w-5 h-5" />
-              Back to Home
+              {t("Back to Home", currentLang)}
             </button>
           </Link>
 
@@ -61,10 +80,10 @@ export default function Encyclopedia() {
             </div>
 
             <h1 className="text-5xl text-amber-100 font-bold mb-4 uppercase">
-              Historic Artifacts Encyclopedia
+              {t("Historic Artifacts Encyclopedia", currentLang)}
             </h1>
             <p className="text-stone-400 italic">
-              Search ancient artifacts, cave art, historic scripts, and archaeological discoveries from museums worldwide
+              {t("Search ancient artifacts, cave art, historic scripts, and archaeological discoveries from museums worldwide", currentLang)}
             </p>
           </div>
 
@@ -84,7 +103,7 @@ export default function Encyclopedia() {
                 disabled={loading}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 px-6 py-3 rounded-lg bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold transition-all disabled:opacity-50"
               >
-                {loading ? "Searching..." : "Search"}
+                {loading ? t("Searching...", currentLang) : t("Search", currentLang)}
               </button>
             </div>
           </form>
@@ -93,7 +112,7 @@ export default function Encyclopedia() {
           <div className="max-w-3xl mx-auto mb-8 text-center">
             <p className="text-stone-500 text-sm flex items-center justify-center gap-2">
               <Globe className="w-4 h-4" />
-              Searching historic collections: The Met, Art Institute of Chicago, Rijksmuseum & more
+              Searching: Wikipedia, The Met, Art Institute of Chicago, Rijksmuseum & more
             </p>
           </div>
 
@@ -108,7 +127,7 @@ export default function Encyclopedia() {
           {loading && (
             <div className="text-center text-amber-100 py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-amber-500 border-t-transparent"></div>
-              <p className="mt-4">Searching museums worldwide...</p>
+              <p className="mt-4">{t("Loading data...", currentLang)}</p>
             </div>
           )}
 
@@ -117,10 +136,10 @@ export default function Encyclopedia() {
             <div className="text-center py-20 max-w-2xl mx-auto">
               <BookOpen className="w-20 h-20 text-amber-600 mx-auto mb-6" />
               <h2 className="text-2xl text-amber-100 font-bold mb-4">
-                Discover Ancient History & Artifacts
+                {t("Discover Ancient History & Artifacts", currentLang)}
               </h2>
               <p className="text-stone-400 mb-8">
-                Search through millions of ancient artifacts, cave paintings, historic scripts, and archaeological discoveries from prestigious museums including
+                Search through millions of ancient artifacts, cave paintings, historic scripts, and archaeological discoveries from Wikipedia and prestigious museums including
                 The Metropolitan Museum of Art, Art Institute of Chicago, and Rijksmuseum.
                 Get instant access to artifact details, historical context, and external
                 resources for deeper learning.
@@ -197,6 +216,13 @@ export default function Encyclopedia() {
                       {artwork.title}
                     </h3>
                     
+                    {/* Wikipedia Extract */}
+                    {artwork.extract && (
+                      <p className="text-stone-400 text-sm mb-4 leading-relaxed">
+                        {artwork.extract}
+                      </p>
+                    )}
+                    
                     <div className="space-y-2 mb-4">
                       <p className="text-amber-300 text-sm font-semibold">
                         {artwork.artist}
@@ -231,10 +257,10 @@ export default function Encyclopedia() {
                           className="flex items-center gap-2 text-sm text-amber-400 hover:text-amber-300 transition-colors"
                         >
                           <ExternalLink className="w-4 h-4" />
-                          View in Museum Collection
+                          {artwork.source === 'Wikipedia' ? 'Read Full Article on Wikipedia' : 'View in Museum Collection'}
                         </a>
                       )}
-                      {artwork.links.artistWiki && (
+                      {artwork.links.artistWiki && artwork.source !== 'Wikipedia' && (
                         <a
                           href={artwork.links.artistWiki}
                           target="_blank"
@@ -245,7 +271,7 @@ export default function Encyclopedia() {
                           Learn about Artist (Wikipedia)
                         </a>
                       )}
-                      {artwork.links.categoryWiki && (
+                      {artwork.links.categoryWiki && artwork.source !== 'Wikipedia' && (
                         <a
                           href={artwork.links.categoryWiki}
                           target="_blank"

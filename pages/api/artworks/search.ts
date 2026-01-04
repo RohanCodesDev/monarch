@@ -1,18 +1,113 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+// Helper to get Wikipedia language code
+function getWikipediaLangCode(lang: string): string {
+  const langMap: Record<string, string> = {
+    en: 'en', es: 'es', fr: 'fr', de: 'de', it: 'it', pt: 'pt',
+    ar: 'ar', zh: 'zh', ja: 'ja', hi: 'hi', el: 'el', he: 'he',
+    ru: 'ru', ko: 'ko', tr: 'tr', nl: 'nl', pl: 'pl', sv: 'sv',
+    da: 'da', fi: 'fi', no: 'no', cs: 'cs', ro: 'ro', hu: 'hu',
+    th: 'th', vi: 'vi', id: 'id', uk: 'uk', bn: 'bn', fa: 'fa',
+    ta: 'ta', te: 'te', mr: 'mr', gu: 'gu', kn: 'kn', ml: 'ml',
+    ur: 'ur', sw: 'sw', az: 'az', eu: 'eu', be: 'be', bg: 'bg',
+    ca: 'ca', hr: 'hr', et: 'et', gl: 'gl', ka: 'ka', is: 'is',
+    ga: 'ga', lv: 'lv', lt: 'lt', mk: 'mk', sr: 'sr', sk: 'sk', sl: 'sl'
+  };
+  return langMap[lang] || 'en';
+}
+
+// Helper to fetch Wikipedia data in specific language
+async function fetchWikipediaArticles(query: string, limit: number = 10, lang: string = 'en') {
+  try {
+    const wikiLang = getWikipediaLangCode(lang);
+    const response = await fetch(
+      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query + ' ancient artifact art history')}&format=json&srlimit=${limit}&srprop=snippet|titlesnippet&origin=*`
+    );
+    const data = await response.json();
+    
+    if (data.query?.search) {
+      return data.query.search.map((item: any) => ({
+        title: item.title,
+        snippet: item.snippet.replace(/<[^>]*>/g, ''),
+        pageId: item.pageid,
+        url: `https://${wikiLang}.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, '_'))}`
+      }));
+    }
+    return [];
+  } catch (error) {
+    console.error('Wikipedia API error:', error);
+    return [];
+  }
+}
+
+// Helper to get Wikipedia article extract and image in specific language
+async function getWikipediaDetails(title: string, lang: string = 'en') {
+  try {
+    const wikiLang = getWikipediaLangCode(lang);
+    const response = await fetch(
+      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=extracts|pageimages|info&exintro=true&explaintext=true&piprop=thumbnail&pithumbsize=500&inprop=url&format=json&origin=*`
+    );
+    const data = await response.json();
+    const pages = data.query?.pages;
+    
+    if (pages) {
+      const page = Object.values(pages)[0] as any;
+      return {
+        extract: page.extract || '',
+        imageUrl: page.thumbnail?.source || null,
+        url: page.fullurl || `https://${wikiLang}.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Wikipedia details error:', error);
+    return null;
+  }
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { query, page = '1' } = req.query;
+    const { query, page = '1', lang = 'en' } = req.query;
     
     if (!query) {
       return res.status(400).json({ error: 'Search query is required' });
     }
 
     const results: any[] = [];
+    const userLang = lang as string;
+    
+    // First, get Wikipedia articles in user's language
+    const wikiArticles = await fetchWikipediaArticles(query as string, 10, userLang);
+    
+    for (const article of wikiArticles) {
+      const details = await getWikipediaDetails(article.title, userLang);
+      
+      if (details) {
+        results.push({
+          id: `wiki_${article.pageId}`,
+          title: article.title,
+          artist: 'Wikipedia',
+          date: 'Historical',
+          origin: 'Various',
+          medium: 'Encyclopedia Article',
+          category: 'Historic Information',
+          imageUrl: details.imageUrl,
+          thumbnailUrl: details.imageUrl,
+          description: article.snippet,
+          extract: details.extract.substring(0, 300) + '...',
+          links: {
+            details: details.url,
+            artistWiki: null,
+            categoryWiki: details.url,
+          },
+          source: 'Wikipedia'
+        });
+      }
+    }
 
     // 1. Art Institute of Chicago API (Free, no key needed)
     try {

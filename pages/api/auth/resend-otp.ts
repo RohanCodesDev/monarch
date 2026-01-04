@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-// nodemailer removed: OTPs will be logged to server console for now
+import { sendOTPEmail } from '../../../lib/nodemailer';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -21,8 +21,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Log OTP to server console (no email sending configured)
-    console.info(`[OTP] resend-otp for ${stored.email}: ${otp} (expires ${otpExpiry.toISOString()})`);
+    // Send OTP via email
+    try {
+      await sendOTPEmail(stored.email, otp);
+      console.info(`[OTP] Resent OTP to ${stored.email} (expires ${otpExpiry.toISOString()})`);
+    } catch (emailError) {
+      console.error('[OTP] Email resend failed:', emailError);
+      return res.status(500).json({ error: 'Failed to resend OTP email. Please try again.' });
+    }
 
     // Update cookie
     stored.otp = otp;

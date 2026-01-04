@@ -102,9 +102,17 @@ export default function VerifyOTP() {
         return;
       }
 
+      // Store user data in localStorage
+      if (data.user) {
+        localStorage.setItem('userId', data.user.id);
+        localStorage.setItem('userEmail', data.user.email);
+        localStorage.setItem('userName', data.user.name);
+        localStorage.setItem('username', data.user.username);
+      }
+
       setSuccess(true);
       setTimeout(() => {
-        router.push("/login?verified=true");
+        router.push("/homepg");
       }, 2000);
     } catch (err) {
       setError("An error occurred during verification");

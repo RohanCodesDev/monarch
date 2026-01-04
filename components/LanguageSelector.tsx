@@ -1,22 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Languages, ChevronDown } from 'lucide-react';
+import { LIBRETRANSLATE_LANGUAGES } from '../lib/translate';
 
-const SUPPORTED_LANGUAGES = {
-  en: 'English',
-  es: 'Español',
-  fr: 'Français',
-  de: 'Deutsch',
-  it: 'Italiano',
-  pt: 'Português',
-  ar: 'العربية',
-  zh: '中文',
-  ja: '日本語',
-  hi: 'हिन्दी',
-  el: 'Ελληνικά',
-  he: 'עברית',
-  ru: 'Русский'
-};
+const SUPPORTED_LANGUAGES = LIBRETRANSLATE_LANGUAGES;
 
 export default function LanguageSelector() {
   const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -33,24 +20,23 @@ export default function LanguageSelector() {
     localStorage.setItem('preferredLanguage', langCode);
     setIsOpen(false);
     
-    // Trigger translation update event
+    // Trigger translation update event (no reload needed)
     window.dispatchEvent(new CustomEvent('languageChange', { detail: langCode }));
-    
-    // Reload page to apply translations
-    window.location.reload();
   };
 
   return (
     <div className="relative">
-      <button
+      <motion.button
         onClick={() => setIsOpen(!isOpen)}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg hover:from-orange-600 hover:to-amber-600 transition-all shadow-lg"
       >
         <Languages size={20} />
         <span className="hidden sm:inline">{SUPPORTED_LANGUAGES[currentLanguage as keyof typeof SUPPORTED_LANGUAGES]}</span>
         <span className="sm:hidden">{currentLanguage.toUpperCase()}</span>
-        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
+        <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      </motion.button>
 
       <AnimatePresence>
         {isOpen && (
@@ -69,11 +55,13 @@ export default function LanguageSelector() {
               transition={{ duration: 0.2 }}
               className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden z-50"
             >
-              <div className="max-h-96 overflow-y-auto">
+              <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100">
                 {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
-                  <button
+                  <motion.button
                     key={code}
                     onClick={() => handleLanguageChange(code)}
+                    whileHover={{ x: 4 }}
+                    transition={{ duration: 0.15 }}
                     className={`w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center justify-between ${
                       currentLanguage === code ? 'bg-orange-100 text-orange-700 font-semibold' : 'text-gray-700'
                     }`}
@@ -82,7 +70,7 @@ export default function LanguageSelector() {
                     {currentLanguage === code && (
                       <span className="text-orange-600">✓</span>
                     )}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </motion.div>

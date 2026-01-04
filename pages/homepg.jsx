@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { QrCode, Paintbrush, BookOpen, User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import LanguageSelector from "../components/LanguageSelector";
+import MonarchLogo from "../components/MonarchLogo";
+import { t } from "../lib/translations";
 
 export default function Homepg() {
   const router = useRouter();
@@ -11,15 +13,29 @@ export default function Homepg() {
   const [userName, setUserName] = useState(null);
   const [username, setUsername] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [currentLang, setCurrentLang] = useState('en');
 
   useEffect(() => {
     // Get user info from localStorage
     const email = localStorage.getItem('userEmail');
     const name = localStorage.getItem('userName');
     const uname = localStorage.getItem('username');
+    const lang = localStorage.getItem('preferredLanguage') || 'en';
     setUserEmail(email);
     setUserName(name);
     setUsername(uname);
+    setCurrentLang(lang);
+    
+    // Listen for language changes with smooth transition
+    const handleLangChange = (e) => {
+      const newLang = e.detail || localStorage.getItem('preferredLanguage') || 'en';
+      // Use requestAnimationFrame for smooth update
+      requestAnimationFrame(() => {
+        setCurrentLang(newLang);
+      });
+    };
+    window.addEventListener('languageChange', handleLangChange);
+    return () => window.removeEventListener('languageChange', handleLangChange);
   }, []);
 
   const handleLogout = () => {
@@ -30,39 +46,38 @@ export default function Homepg() {
     router.push('/login');
   };
 
-  const features = [
+  const getFeatures = () => [
     {
       icon: QrCode,
-      title: "Analyze Historic Artifacts",
-      description: "Upload images of cave paintings, ancient scripts, artifacts, or historic artworks to discover their origins and meanings.",
+      title: t("Analyze Historic Artifacts", currentLang),
+      description: t("Upload images of cave paintings, ancient scripts, artifacts, or historic artworks to discover their origins and meanings.", currentLang),
       gradient: "from-red-600 via-orange-600 to-amber-500",
       link: "/know-your-art"
     },
     {
       icon: Paintbrush,
-      title: "Generate Historic Art",
-      description: "Create authentic prehistoric cave paintings, ancient scripts, hieroglyphics, or historic artifacts using AI.",
+      title: t("Generate Historic Art", currentLang),
+      description: t("Create authentic prehistoric cave paintings, ancient scripts, hieroglyphics, or historic artifacts using AI.", currentLang),
       gradient: "from-orange-600 via-amber-500 to-yellow-600",
       link: "/typeprompt"
     },
     {
       icon: BookOpen,
-      title: "Historic Encyclopedia",
-      description: "Search and explore ancient artifacts, cave art, historic scripts, and archaeological discoveries from museums worldwide.",
+      title: t("Historic Encyclopedia", currentLang),
+      description: t("Search and explore ancient artifacts, cave art, historic scripts, and archaeological discoveries from museums worldwide.", currentLang),
       gradient: "from-amber-600 via-orange-500 to-red-600",
       link: "/encyclopedia"
     }
   ];
+  
+  const features = getFeatures();
 
   const FeatureCard = ({ icon: Icon, title, description, gradient, index, link }) => {
     const cardContent = (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: index * 0.1 }}
         whileHover={{ scale: 1.03, y: -5 }}
         whileTap={{ scale: 0.98 }}
-        className="group relative overflow-hidden rounded-2xl bg-stone-900/80 backdrop-blur-sm shadow-2xl hover:shadow-amber-900/40 transition-all duration-300 cursor-pointer border border-amber-900/30 will-change-transform"
+        className="group relative overflow-hidden rounded-2xl bg-stone-900/80 backdrop-blur-sm shadow-2xl hover:shadow-amber-900/40 transition-all duration-300 cursor-pointer border border-amber-900/30 will-change-transform h-full"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }}
@@ -72,28 +87,28 @@ export default function Homepg() {
         <div className="absolute inset-0 border-2 border-transparent group-hover:border-amber-600/30 rounded-2xl transition-all duration-300" />
         
         {/* Content */}
-        <div className="relative p-8 flex flex-col items-center text-center space-y-4">
+        <div className="relative p-1.5 sm:p-8 flex flex-col items-center text-center space-y-1 sm:space-y-4">
           {/* Icon Container */}
           <motion.div
             whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
             transition={{ duration: 0.5 }}
-            className={`w-24 h-24 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-xl relative`}
+            className={`w-9 h-9 sm:w-24 sm:h-24 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-xl relative`}
             style={{
               boxShadow: '0 0 30px rgba(217, 119, 6, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.3)'
             }}
           >
-            <Icon className="w-12 h-12 text-amber-50" strokeWidth={2.5} />
+            <Icon className="w-5 h-5 sm:w-12 sm:h-12 text-amber-50" strokeWidth={2.5} />
             {/* Ancient glow effect */}
             <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-black/50 to-transparent" />
           </motion.div>
           
           {/* Title */}
-          <h3 className="text-xl font-bold text-amber-100 group-hover:text-amber-50 transition-colors uppercase tracking-wide">
+          <h3 className="text-base sm:text-xl font-bold text-amber-100 group-hover:text-amber-50 transition-colors uppercase tracking-wide leading-tight">
             {title}
           </h3>
           
           {/* Description */}
-          <p className="text-stone-400 text-sm leading-relaxed">
+          <p className="text-[12px] leading-tight sm:text-sm text-stone-400 sm:leading-relaxed">
             {description}
           </p>
           
@@ -101,17 +116,18 @@ export default function Homepg() {
           <motion.div
             initial={{ x: -10, opacity: 0 }}
             whileHover={{ x: 0, opacity: 1 }}
-            className="absolute bottom-6 right-6 text-amber-700/50 group-hover:text-amber-500"
+            className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 text-amber-700/50 group-hover:text-amber-500"
           >
             <svg
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
+              className="sm:w-6 sm:h-6"
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
@@ -119,8 +135,8 @@ export default function Homepg() {
         </div>
         
         {/* Cave painting style decorative marks */}
-        <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-amber-800/40 rounded-tl-lg" />
-        <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-amber-800/40 rounded-br-lg" />
+        <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-5 h-5 sm:w-8 sm:h-8 border-l-2 border-t-2 border-amber-800/40 rounded-tl-lg" />
+        <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 w-5 h-5 sm:w-8 sm:h-8 border-r-2 border-b-2 border-amber-800/40 rounded-br-lg" />
       </motion.div>
     );
 
@@ -168,9 +184,9 @@ export default function Homepg() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 container mx-auto px-4 py-16 lg:py-24">
+      <div className="relative z-10 container mx-auto px-2 py-1 sm:py-2 lg:py-4">
         {/* Top Bar with Language Selector and User Profile */}
-        <div className="absolute top-8 right-8 flex items-center gap-4">
+        <div className="flex justify-end items-center gap-1 sm:gap-4 mb-1 sm:mb-2 flex-wrap">
           {/* Language Selector */}
           <LanguageSelector />
           
@@ -181,10 +197,11 @@ export default function Homepg() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2 bg-stone-900/80 backdrop-blur-sm border border-amber-800/50 rounded-lg px-4 py-2 text-amber-100 hover:border-amber-600 transition-colors"
+                className="flex items-center gap-2 bg-stone-900/80 backdrop-blur-sm border border-amber-800/50 rounded-lg px-3 sm:px-4 py-2 text-amber-100 hover:border-amber-600 transition-colors"
               >
-                <User className="w-5 h-5" />
-                <span className="text-sm">@{username || userName}</span>
+                <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm hidden sm:inline">@{username || userName}</span>
+                <span className="text-xs sm:hidden">{t("Profile", currentLang)}</span>
               </motion.button>
 
               {/* Dropdown Menu */}
@@ -192,10 +209,10 @@ export default function Homepg() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="absolute right-0 mt-2 w-48 bg-stone-900 border border-amber-800/50 rounded-lg shadow-xl overflow-hidden"
+                  className="absolute right-0 mt-2 w-48 bg-stone-900 border border-amber-800/50 rounded-lg shadow-xl overflow-hidden z-50"
                 >
                   <div className="p-3 border-b border-amber-800/30">
-                    <p className="text-xs text-stone-500">Signed in as</p>
+                    <p className="text-xs text-stone-500">{t("Signed in as", currentLang)}</p>
                     <p className="text-sm text-amber-100 font-semibold">{userName}</p>
                     <p className="text-xs text-stone-400 truncate">@{username}</p>
                     <p className="text-xs text-stone-500 truncate mt-1">{userEmail}</p>
@@ -205,76 +222,55 @@ export default function Homepg() {
                     className="w-full flex items-center gap-2 px-4 py-3 text-left text-red-400 hover:bg-stone-800 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
+                    <span>{t("Logout", currentLang)}</span>
                   </button>
                 </motion.div>
               )}
             </div>
           )}
+        
+          {/* Login/Register buttons if not logged in */}
+          {!userEmail && (
+            <>
+              <Link href="/login">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-3 sm:px-4 py-2 bg-stone-900/80 backdrop-blur-sm border border-amber-800/50 rounded-lg text-amber-100 hover:border-amber-600 transition-colors text-xs sm:text-sm"
+                >
+                  {t("Login", currentLang)}
+                </motion.button>
+              </Link>
+              <Link href="/register">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-3 sm:px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg text-white font-semibold hover:from-amber-700 hover:to-orange-700 transition-colors text-xs sm:text-sm"
+                >
+                  {t("Register", currentLang)}
+                </motion.button>
+              </Link>
+            </>
+          )}
         </div>
-
-        {/* Login/Register buttons if not logged in */}
-        {!userEmail && (
-          <div className="absolute top-8 right-8 flex gap-3">
-            <LanguageSelector />
-            <Link href="/login">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-stone-900/80 backdrop-blur-sm border border-amber-800/50 rounded-lg text-amber-100 hover:border-amber-600 transition-colors"
-              >
-                Login
-              </motion.button>
-            </Link>
-            <Link href="/register">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg text-white font-semibold hover:from-amber-700 hover:to-orange-700 transition-colors"
-              >
-                Register
-              </motion.button>
-            </Link>
-          </div>
-        )}
 
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center -mb-6 sm:-mb-4"
         >
-          <motion.h1
-            className="text-5xl lg:text-7xl font-bold text-amber-100 mb-6 uppercase tracking-wider"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            style={{
-              textShadow: '0 0 40px rgba(217, 119, 6, 0.5), 0 0 20px rgba(0, 0, 0, 0.8)'
-            }}
-          >
-            Monarch - Historic Artifacts
-          </motion.h1>
           <motion.div
-            className="w-32 h-1 bg-gradient-to-r from-transparent via-amber-600 to-transparent mx-auto mb-6"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 1, delay: 0.3 }}
-          />
-          <motion.p
-            className="text-lg text-stone-400 max-w-2xl mx-auto italic"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            className="flex justify-center mb-0"
           >
-            Discover prehistoric cave paintings, ancient scripts, artifacts, and archaeological treasures. 
-            AI-powered analysis to decode humanity's earliest stories and civilizations.
+            <MonarchLogo size="xl" className="h-[280px] lg:h-[420px]" />
+          </motion.div>
+          <motion.p
+            className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 italic px-3 -mt-1 sm:-mt-2"
+          >
           </motion.p>
         </motion.div>
 
         {/* Feature Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6 max-w-7xl mx-auto mb-1 sm:mb-4 -mt-8 sm:-mt-4">
           {features.map((feature, index) => (
             <div key={index}>
               <FeatureCard
@@ -291,10 +287,7 @@ export default function Homepg() {
 
         {/* Bottom CTA with ancient symbols */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-center mt-16 space-y-4"
+          className="text-center mt-4 sm:mt-8 space-y-4 hidden sm:block"
         >
           <div className="flex items-center justify-center gap-4 text-amber-800/50">
             <div className="w-8 h-0.5 bg-gradient-to-r from-transparent to-amber-800/50" />
@@ -302,7 +295,7 @@ export default function Homepg() {
             <div className="w-8 h-0.5 bg-gradient-to-l from-transparent to-amber-800/50" />
           </div>
           <p className="text-stone-500 text-sm uppercase tracking-widest">
-            Choose Your Path
+            {t("Choose Your Path", currentLang)}
           </p>
         </motion.div>
       </div>

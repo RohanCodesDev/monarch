@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
-// nodemailer removed: OTPs will be logged to server console for now
+import { sendOTPEmail } from '../../../lib/nodemailer';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -41,8 +41,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Log OTP to server console (no email sending configured)
-    console.info(`[OTP] send-otp for ${email}: ${otp} (expires ${otpExpiry.toISOString()})`);
+    // Send OTP via email
+    try {
+      await sendOTPEmail(email, otp);
+      console.info(`[OTP] Sent OTP to ${email} (expires ${otpExpiry.toISOString()})`);
+    } catch (emailError) {
+      console.error('[OTP] Email send failed:', emailError);
+      return res.status(500).json({ error: 'Failed to send OTP email. Please try again.' });
+    }
 
     // Store OTP data and registration info in base64 encoded cookie
     const otpData = { email: email.toLowerCase(), username, name, hashedPassword, otp, otpExpiry: otpExpiry.toISOString() };

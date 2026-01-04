@@ -1,50 +1,28 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect to homepg.jsx as the main landing page
+    router.push('/homepg');
+  }, [router]);
+
   return (
     <>
       <Head>
-        <title>Monarch | Next.js Pages</title>
-        <meta name="description" content="Monarch starter on Next.js pages router" />
+        <title>Monarch | Historic Artifacts Explorer</title>
+        <meta name="description" content="Discover prehistoric cave paintings, ancient artifacts & archaeological treasures with AI" />
       </Head>
-      <main>
-        <header className="header">
-          <div className="badge">Next.js · Pages Router</div>
-          <nav className="nav">
-            <Link href="/">Home</Link>
-            <Link href="/about">About</Link>
-            <a href="/api/hello">API</a>
-          </nav>
-        </header>
-
-        <section className="card-grid">
-          <div className="card">
-            <h2>Welcome</h2>
-            <p>
-              Monarch is ready for the classic pages router. Edit any file under the pages directory
-              and your routes update instantly.
-            </p>
-          </div>
-
-          <div className="card">
-            <h2>Commands</h2>
-            <p>Use npm run dev to start the dev server, npm run build to prepare for production.</p>
-          </div>
-
-          <div className="card">
-            <h2>Styling</h2>
-            <p>Global styles live in styles/globals.css. Extend or replace them as you ship features.</p>
-          </div>
-
-          <div className="card">
-            <h2>API Route</h2>
-            <p>Try the built-in API example at /api/hello. Replace it with your own handlers.</p>
-          </div>
-        </section>
-
-        <p className="footer">Built with Next.js 14 · React 18 · Pages Router</p>
-      </main>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-950 via-stone-900 to-neutral-900">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-amber-500 border-t-transparent mb-4"></div>
+          <p className="text-amber-100 text-xl">Loading Monarch...</p>
+        </div>
+      </div>
     </>
   );
 }

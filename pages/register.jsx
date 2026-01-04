@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import MonarchLogo from "../components/MonarchLogo";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -65,8 +66,11 @@ export default function RegisterPage() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+          <MonarchLogo size="lg" animated={false} />
+        </div>
         <h1 style={styles.title}>Create Account</h1>
-        <p style={styles.subtitle}>Join the Cave Art Analyzer</p>
+        <p style={styles.subtitle}>Join Monarch</p>
 
         <form onSubmit={handleRegister}>
           <label style={styles.label}>Full Name</label>
@@ -148,62 +152,79 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "linear-gradient(135deg, #0f0f0f, #1c1917)",
-    padding: "20px",
+    background: "linear-gradient(135deg, #0a0a0a 0%, #1a1410 50%, #0a0a0a 100%)",
+    padding: "16px",
+    position: "relative",
+    overflow: "hidden",
   },
   card: {
     width: "100%",
     maxWidth: "420px",
-    background: "#111",
-    borderRadius: "12px",
-    padding: "32px",
-    boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
+    background: "rgba(17, 17, 17, 0.95)",
+    borderRadius: "16px",
+    padding: "clamp(24px, 5vw, 32px)",
+    boxShadow: "0 20px 40px rgba(0,0,0,0.6), 0 0 100px rgba(245, 158, 11, 0.1)",
+    border: "1px solid rgba(245, 158, 11, 0.2)",
+    backdropFilter: "blur(10px)",
   },
   title: {
     color: "#fbbf24",
     textAlign: "center",
     marginBottom: "4px",
+    fontSize: "clamp(24px, 5vw, 28px)",
   },
   subtitle: {
     color: "#a8a29e",
     textAlign: "center",
     marginBottom: "24px",
+    fontSize: "clamp(13px, 2.5vw, 14px)",
   },
   label: {
     display: "block",
     color: "#e7e5e4",
     marginBottom: "6px",
     marginTop: "16px",
+    fontSize: "14px",
+    fontWeight: "500",
   },
   input: {
     width: "100%",
-    padding: "12px",
+    padding: "12px 14px",
     borderRadius: "8px",
     border: "1px solid #444",
     background: "#0a0a0a",
     color: "#fff",
+    fontSize: "15px",
+    transition: "border-color 0.2s",
+    outline: "none",
   },
   button: {
     width: "100%",
     marginTop: "24px",
-    padding: "12px",
+    padding: "14px",
     borderRadius: "8px",
     border: "none",
-    background: "#f59e0b",
+    background: "linear-gradient(135deg, #f59e0b, #d97706)",
     color: "#000",
     fontWeight: "bold",
     cursor: "pointer",
+    fontSize: "16px",
+    transition: "transform 0.2s, box-shadow 0.2s",
   },
   error: {
     color: "#ef4444",
     marginTop: "12px",
-    fontSize: "14px",
+    fontSize: "13px",
+    padding: "8px 12px",
+    background: "rgba(239, 68, 68, 0.1)",
+    borderRadius: "6px",
+    border: "1px solid rgba(239, 68, 68, 0.3)",
   },
   footer: {
     marginTop: "20px",
     textAlign: "center",
     color: "#a8a29e",
-    fontSize: "14px",
+    fontSize: "clamp(13px, 2.5vw, 14px)",
   },
   link: {
     color: "#fbbf24",
