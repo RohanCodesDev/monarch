@@ -12,25 +12,28 @@ export default function MonarchLogo({
   className = '',
   animated = true 
 }: MonarchLogoProps) {
-  const sizeClasses = {
-    sm: 'h-16 w-auto',
-    md: 'h-28 w-auto',
-    lg: 'h-40 w-auto',
-    xl: 'h-56 w-auto',
+  const sizeMap = {
+    sm: { width: 64, height: 64 },
+    md: { width: 112, height: 112 },
+    lg: { width: 160, height: 160 },
+    xl: { width: 224, height: 224 },
   };
 
   const LogoImage = () => (
     <div 
-      className={`${sizeClasses[size]} ${className} relative`}
+      className={`${className} relative`}
       style={{
         filter: 'brightness(0) saturate(100%) invert(77%) sepia(52%) saturate(450%) hue-rotate(358deg) brightness(103%) contrast(96%) drop-shadow(0 0 20px rgba(251, 191, 36, 0.4))',
+        width: sizeMap[size].width,
+        height: sizeMap[size].height,
       }}
     >
       <Image 
         src="/monarch2.png"
         alt="Monarch"
-        fill
-        className="object-contain"
+        width={sizeMap[size].width}
+        height={sizeMap[size].height}
+        className="object-contain w-full h-full"
         priority
       />
     </div>
