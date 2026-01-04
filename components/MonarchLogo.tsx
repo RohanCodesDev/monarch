@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface MonarchLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -25,13 +26,12 @@ export default function MonarchLogo({
         filter: 'brightness(0) saturate(100%) invert(77%) sepia(52%) saturate(450%) hue-rotate(358deg) brightness(103%) contrast(96%) drop-shadow(0 0 20px rgba(251, 191, 36, 0.4))',
       }}
     >
-      <img 
+      <Image 
         src="/monarch2.png"
         alt="Monarch"
-        className="h-full w-auto"
-        style={{
-          objectFit: 'contain',
-        }}
+        fill
+        className="object-contain"
+        priority
       />
     </div>
   );

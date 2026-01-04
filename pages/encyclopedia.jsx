@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { BookOpen, Search, ExternalLink, ArrowLeft, Globe } from "lucide-react";
 import Link from "next/link";
 import Head from "next/head";
+import Image from "next/image";
 import { t } from "../lib/translations";
 
 export default function Encyclopedia() {
@@ -119,7 +120,7 @@ export default function Encyclopedia() {
           {/* Results Count */}
           {searched && !loading && (
             <div className="max-w-6xl mx-auto mb-6 text-stone-400">
-              Found {artworks.length} artworks for "{searchQuery}"
+              Found {artworks.length} artworks for &quot;{searchQuery}&quot;
             </div>
           )}
 
@@ -171,7 +172,7 @@ export default function Encyclopedia() {
           {searched && !loading && artworks.length === 0 && (
             <div className="text-center py-20">
               <Search className="w-16 h-16 text-stone-600 mx-auto mb-4" />
-              <p className="text-stone-400 text-lg">No historic artifacts found for "{searchQuery}"</p>
+              <p className="text-stone-400 text-lg">No historic artifacts found for &quot;{searchQuery}&quot;</p>
               <p className="text-stone-500 mt-2">
                 Try keywords like: cave paintings, hieroglyphics, ancient pottery, cuneiform, artifacts, archaeological finds
               </p>
@@ -192,10 +193,11 @@ export default function Encyclopedia() {
                   {/* Image */}
                   {artwork.imageUrl && (
                     <div className="relative h-56 overflow-hidden bg-stone-950">
-                      <img
+                      <Image
                         src={artwork.imageUrl}
                         alt={artwork.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
                         onError={(e) => {
                           e.target.style.display = 'none';
                         }}

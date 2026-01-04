@@ -98,7 +98,7 @@ export default function LoginPage() {
         </form>
 
         <p style={styles.footer}>
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/register" style={styles.link}>
             Register
           </Link>

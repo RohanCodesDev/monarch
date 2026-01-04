@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Head from "next/head";
+import Image from "next/image";
 
 export default function KnowYourArt() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -351,11 +352,14 @@ export default function KnowYourArt() {
                   >
                     <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </button>
-                  <img
-                    src={imagePreview}
-                    alt="Selected artwork"
-                    className="w-full rounded-lg mb-4 sm:mb-6"
-                  />
+                  <div className="relative w-full aspect-video mb-4 sm:mb-6">
+                    <Image
+                      src={imagePreview}
+                      alt="Selected artwork"
+                      fill
+                      className="rounded-lg object-contain"
+                    />
+                  </div>
                   
                   {!analysis && !loading && (
                     <button

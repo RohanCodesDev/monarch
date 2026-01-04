@@ -8,6 +8,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import Head from "next/head";
 
 export default function TypePrompt() {
@@ -140,11 +141,14 @@ export default function TypePrompt() {
           {/* Result */}
           {imageUrl && (
             <div className="max-w-3xl mx-auto bg-stone-900 p-4 sm:p-6 rounded-xl border border-amber-800">
-              <img
-                src={imageUrl}
-                alt="Generated cave art"
-                className="w-full rounded-lg mb-5 sm:mb-6"
-              />
+              <div className="relative w-full aspect-square mb-5 sm:mb-6">
+                <Image
+                  src={imageUrl}
+                  alt="Generated cave art"
+                  fill
+                  className="rounded-lg object-contain"
+                />
+              </div>
 
               <button
                 onClick={handleDownload}

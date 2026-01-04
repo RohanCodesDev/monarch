@@ -267,7 +267,7 @@ export default function VerifyOTP() {
 
               <div className="mt-6 text-center">
                 <p className="text-stone-600 text-sm mb-3">
-                  Didn't receive the code?
+                  Didn&apos;t receive the code?
                 </p>
                 <button
                   onClick={handleResendOTP}
