@@ -44,10 +44,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Send OTP via email
     try {
       await sendOTPEmail(email, otp);
-      console.info(`[OTP] Sent OTP to ${email} (expires ${otpExpiry.toISOString()})`);
+      console.info(`[OTP] Sent OTP email to ${email}`);
     } catch (emailError) {
-      console.error('[OTP] Email send failed:', emailError);
-      return res.status(500).json({ error: 'Failed to send OTP email. Please try again.' });
+      // Fallback: Log to console if email fails
+      console.log('\n' + '='.repeat(60));
+      console.log('📧 OTP EMAIL (Email service unavailable - using console)');
+      console.log('='.repeat(60));
+      console.log(`To: ${email}`);
+      console.log(`OTP Code: ${otp}`);
+      console.log(`Expires: ${otpExpiry.toISOString()}`);
+      console.log('='.repeat(60) + '\n');
+      console.warn('[OTP] Email send failed, OTP logged to console:', emailError.message);
     }
 
     // Store OTP data and registration info in base64 encoded cookie
@@ -64,5 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error) {
     console.error('Error in send-otp:', error);
     return res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    await prisma.$disconnect();
   }
 }

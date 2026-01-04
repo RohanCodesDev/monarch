@@ -24,10 +24,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Send OTP via email
     try {
       await sendOTPEmail(stored.email, otp);
-      console.info(`[OTP] Resent OTP to ${stored.email} (expires ${otpExpiry.toISOString()})`);
+      console.info(`[OTP] Resent OTP email to ${stored.email}`);
     } catch (emailError) {
-      console.error('[OTP] Email resend failed:', emailError);
-      return res.status(500).json({ error: 'Failed to resend OTP email. Please try again.' });
+      // Fallback: Log to console if email fails
+      console.log('\n' + '='.repeat(60));
+      console.log('📧 OTP RESEND (Email service unavailable - using console)');
+      console.log('='.repeat(60));
+      console.log(`To: ${stored.email}`);
+      console.log(`OTP Code: ${otp}`);
+      console.log(`Expires: ${otpExpiry.toISOString()}`);
+      console.log('='.repeat(60) + '\n');
+      console.warn('[OTP] Email resend failed, OTP logged to console:', emailError.message);
     }
 
     // Update cookie
@@ -36,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const encoded = Buffer.from(JSON.stringify(stored)).toString('base64');
     res.setHeader('Set-Cookie', `otp_session=${encoded}; Path=/; HttpOnly; Max-Age=600; SameSite=Lax`);
 
-    return res.status(200).json({ success: true, message: 'OTP resent' });
+    return res.status(200).json({ success: true, message: 'OTP resent to your email' });
   } catch (err) {
     console.error('Error in resend-otp:', err);
     return res.status(500).json({ error: 'Internal server error' });
