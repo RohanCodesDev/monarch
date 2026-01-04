@@ -157,14 +157,6 @@ export default function VerifyOTP() {
     }
   };
 
-  if (!router.isReady) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center p-4">
-        <Loader className="w-8 h-8 animate-spin text-amber-700" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center p-4">
       <motion.div

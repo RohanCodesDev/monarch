@@ -2,12 +2,12 @@ import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
   return (
-    <Html lang="en">
+    <Html lang="en" suppressHydrationWarning>
       <Head>
         <meta name="theme-color" content="#0c0f16" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <body>
+      <body suppressHydrationWarning>
         <Main />
         <NextScript />
       </body>
