@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log(`OTP Code: ${otp}`);
       console.log(`Expires: ${otpExpiry.toISOString()}`);
       console.log('='.repeat(60) + '\n');
-      console.warn('[OTP] Email resend failed, OTP logged to console:', emailError.message);
+      console.warn('[OTP] Email resend failed, OTP logged to console:', emailError instanceof Error ? emailError.message : String(emailError));
     }
 
     // Update cookie
