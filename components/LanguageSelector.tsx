@@ -25,7 +25,7 @@ export default function LanguageSelector() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative z-50">
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.05 }}
@@ -43,7 +43,7 @@ export default function LanguageSelector() {
           <>
             {/* Backdrop */}
             <div 
-              className="fixed inset-0 z-40"
+              className="fixed inset-0 z-[100]"
               onClick={() => setIsOpen(false)}
             />
             
@@ -53,7 +53,13 @@ export default function LanguageSelector() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden z-50"
+              className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden z-[101]"
+              style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                maxHeight: '384px',
+              }}
             >
               <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100">
                 {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
