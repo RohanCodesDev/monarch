@@ -30,7 +30,7 @@ export default function LanguageSelector() {
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg hover:from-orange-600 hover:to-amber-600 transition-all shadow-lg"
+        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-lg hover:from-orange-700 hover:to-amber-700 transition-all shadow-lg backdrop-blur-sm"
       >
         <Languages size={20} />
         <span className="hidden sm:inline">{SUPPORTED_LANGUAGES[currentLanguage as keyof typeof SUPPORTED_LANGUAGES]}</span>
@@ -43,38 +43,43 @@ export default function LanguageSelector() {
           <>
             {/* Backdrop */}
             <div 
-              className="fixed inset-0 z-[100]"
+              className="fixed inset-0 z-[100] bg-black/20 backdrop-blur-sm"
               onClick={() => setIsOpen(false)}
             />
             
-            {/* Dropdown */}
+            {/* Dropdown with Glassmorphism */}
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden z-[101]"
+              className="absolute right-0 mt-2 w-64 rounded-xl shadow-2xl border border-amber-500/20 overflow-hidden z-[101]"
               style={{
                 position: 'absolute',
                 top: '100%',
                 right: 0,
                 maxHeight: '384px',
+                background: 'rgba(23, 23, 23, 0.95)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
               }}
             >
-              <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100">
+              <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-amber-600/50 scrollbar-track-stone-900/50">
                 {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
                   <motion.button
                     key={code}
                     onClick={() => handleLanguageChange(code)}
-                    whileHover={{ x: 4 }}
+                    whileHover={{ x: 4, backgroundColor: 'rgba(217, 119, 6, 0.15)' }}
                     transition={{ duration: 0.15 }}
-                    className={`w-full px-4 py-3 text-left hover:bg-orange-50 transition-colors flex items-center justify-between ${
-                      currentLanguage === code ? 'bg-orange-100 text-orange-700 font-semibold' : 'text-gray-700'
+                    className={`w-full px-4 py-3 text-left transition-colors flex items-center justify-between border-b border-stone-800/50 last:border-0 ${
+                      currentLanguage === code 
+                        ? 'bg-amber-600/20 text-amber-400 font-semibold' 
+                        : 'text-stone-200 hover:text-amber-300'
                     }`}
                   >
                     <span>{name}</span>
                     {currentLanguage === code && (
-                      <span className="text-orange-600">✓</span>
+                      <span className="text-amber-500">✓</span>
                     )}
                   </motion.button>
                 ))}
